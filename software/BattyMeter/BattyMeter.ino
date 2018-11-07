@@ -1,3 +1,5 @@
+// BattyMeter V1.01
+
 /*
  This sketch prints "Hello World!" to the LCD
 
@@ -45,17 +47,17 @@
 #define PIN_I2 2
 #define PIN_V2 3
 
+#define zeroI1 508
+#define zeroI2 508
+
 
 // include the library code:
 #include <LiquidCrystal.h>
 #include <SPI.h>
 #include <SD.h>
-#include <EEPROM.h>
+
 
 const int chipSelect = 4;
-
-int addr = 10;
-int value;
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(10, 9, 8, 7, 6, 5);
@@ -77,11 +79,6 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
     
-  value = EEPROM.read(addr);
-  if (value > 100)
-    EEPROM.write(addr, 10);
-    else 
-      EEPROM.write(addr, value + 1);
   }
 
   Serial.print("Initializing SD card...");
@@ -113,30 +110,50 @@ void loop() {
 //      dataString += ",";
 //    }
 //  }
-  
-  int V1 = analogRead(PIN_V1);
-  int I1 = analogRead(PIN_I1);
-  
-  int V2 = analogRead(PIN_V2);
-  int I2 = analogRead(PIN_I2);
 
+  // Read the sensors
+    
+  int analogV1 = analogRead(PIN_V1);
+  int analogI1 = analogRead(PIN_I1);
+  
+  int analogV2 = analogRead(PIN_V2);
+  int analogI2 = analogRead(PIN_I2);
+
+  // Convert the analog variables into physics variables
+
+  String strV1 = String((float) analogV1*55/1024).substring(0,4);
+  String strI1 = String((float) (analogI1 - zeroI1)/1024*60);
+
+  if (analogI1 > zeroI1)
+    strI1.substring(0,4);
+    else strI1.substring(0,5);
+  
+  
+  String strV2 = String((float) analogV2*55/1024).substring(0,4);
+  String strI2 = String((float) (analogI2 - zeroI2)/1024*60);
+
+  if (analogI2 > zeroI2)
+    strI2.substring(0,4); 
+  else strI2.substring(0,5);
+  
   String dataString_line1 = "";
   String dataString_line2 = "";
-  dataString_line1 += "V1:" + String(V1) + "   V2:" +  String(V2);
-  dataString_line2 += "I1:" + String(I1) + "   I2:" +  String(I2);
+  dataString_line1 += "V1:" + String(strV1) + " V2:" +  String(strV2);
+  dataString_line2 += "I1:" + String(strI1) + " I2:" +  String(strI2);
   
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open("datalog2.txt", FILE_WRITE);
 
-  String saveString = "V1;" + String(V1) + ";I1;" +  String(I1) + ";V2;" +  String(V2) + ";I2;" +  String(I2);
+  String saveString = "V1;" + String(strV1) + ";I1;" +  String(strI1) + ";V2;" +  String(strV2) + ";I2;" +  String(strI2);
   
   // if the file is available, write to it:
   if (dataFile) {
     dataFile.println(saveString);
     dataFile.close();
     // print to the serial port too:
-    Serial.println(saveString);
+    //Serial.println(saveString);
+    Serial.println(strV1 + " ; " + String(analogV1));
   }
   // if the file isn't open, pop up an error:
   else {
@@ -146,12 +163,18 @@ void loop() {
 
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
-  lcd.setCursor(0, 0);
+  lcd.clear(); // Clear the lcd screen also set the cursor in 0 0 
+  lcd.print("V1:" + strV1);
+  lcd.setCursor(8, 0);
+  lcd.print("V2:" + strV2);
+
   // print the number of seconds since reset:
-  lcd.print(dataString_line1);
 
   lcd.setCursor(0, 1);
-  lcd.print(dataString_line2);
+  lcd.print("I1:" + strI1);
+  lcd.setCursor(8, 1);
+  lcd.print("I2:" + strI2);
+
 
 
   
