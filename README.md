@@ -5,9 +5,9 @@ This proyect is about a device that measures two continues voltages and two cont
 
 ## Specifications
 
-**Voltage span:** 0 - 55 V
-**Voltage resolution:** 55/1024 = 55 mV
-**Current span:** -30 - 30 A  
+**Voltage span:** 0 - 55 V  
+**Voltage resolution:** 55/1024 = 55 mV  
+**Current span:** -30 - 30 A   
 **Current resolution:** 60/1024 = 60 mA  
 
 
