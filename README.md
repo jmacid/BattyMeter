@@ -5,7 +5,8 @@ This proyect is about a device that measures two continues voltages and two cont
 
 ## Specifications
 
-
+**Voltage resolution:** 55/1024 = 55 mV
+**Current resolution:** 60/1024 = 60 mA
 
 
 ## Schematic
